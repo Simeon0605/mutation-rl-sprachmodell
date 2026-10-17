@@ -27,8 +27,8 @@ ap.add_argument("--topk", type=int, default=15)
 ap.add_argument("--chars", type=int, default=140)
 args = ap.parse_args()
 
-# 1) frisch trainierter Checkpoint, 2) letzter Stand, 3) fertiges 1M-Modell aus dem Repo
-for cand in ["ckpt_best.npz", "ckpt.npz", "models/best_1m.npz"]:
+# 1) frisch trainierter Checkpoint, 2) letzter Stand, 3) fertiges 10M-Modell aus dem Repo
+for cand in ["ckpt_best.npz", "ckpt.npz", "models/best_10m.npz", "models/best_1m.npz"]:
     if os.path.exists(cand):
         ckpt = cand
         break
