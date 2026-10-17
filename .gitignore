@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# Trainings-Artefakte (werden neu erzeugt)
+ckpt.npz
+ckpt_best.npz
+corpus_de.txt
+corpus_ids.npy
