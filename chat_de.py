@@ -27,8 +27,6 @@ ap.add_argument("--topk", type=int, default=15)
 ap.add_argument("--chars", type=int, default=140)
 args = ap.parse_args()
 
-CFG = dict(d=128, L=5, T=64, H=4, ff=512)
-
 # 1) frisch trainierter Checkpoint, 2) letzter Stand, 3) fertiges 1M-Modell aus dem Repo
 for cand in ["ckpt_best.npz", "ckpt.npz", "models/best_1m.npz"]:
     if os.path.exists(cand):
@@ -36,7 +34,14 @@ for cand in ["ckpt_best.npz", "ckpt.npz", "models/best_1m.npz"]:
         break
 else:
     sys.exit("Kein Checkpoint gefunden. Erst py train_de.py laufen lassen.")
-theta = np.load(ckpt)["theta"].astype(np.float32)
+z = np.load(ckpt)
+theta = z["theta"].astype(np.float32)
+# Konfiguration steht seit der 10M-Version im Checkpoint selbst;
+# aeltere 1M-Checkpoints (z.B. models/best_1m.npz) nutzen den Fallback.
+if "cfg" in z.files:
+    CFG = json.loads(str(z["cfg"]))
+else:
+    CFG = dict(d=128, L=5, T=64, H=4, ff=512)
 vocab = json.load(open("vocab.json", encoding="utf-8"))["vocab"]
 stoi = {c: i for i, c in enumerate(vocab)}
 itos = vocab + [""]
@@ -44,7 +49,7 @@ V = len(vocab) + 1
 P = M.from_flat(theta, V, CFG)
 rng = np.random.default_rng()
 
-print(f"[Modell geladen: {ckpt}]", flush=True)
+print(f"[Modell geladen: {ckpt} | d={CFG['d']}, L={CFG['L']}]", flush=True)
 
 
 def antwort(text: str) -> str:

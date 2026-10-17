@@ -30,24 +30,24 @@ sys.stdout.reconfigure(encoding="utf-8")
 ap = argparse.ArgumentParser()
 ap.add_argument("--minutes", type=float, default=15.0)
 ap.add_argument("--resume", action="store_true")
-ap.add_argument("--pairs", type=int, default=8, help="ES: Paare antithetischer Mutanten pro Generation")
+ap.add_argument("--pairs", type=int, default=6, help="ES: Paare antithetischer Mutanten pro Generation")
 ap.add_argument("--sigma", type=float, default=0.015, help="ES: Mutationsstaerke")
 ap.add_argument("--es-lr", type=float, default=0.001)
-ap.add_argument("--rl-steps", type=int, default=8, help="REINFORCE-Schritte pro Generation")
+ap.add_argument("--rl-steps", type=int, default=6, help="REINFORCE-Schritte pro Generation")
 ap.add_argument("--rl-lr", type=float, default=8e-4)
 ap.add_argument("--expert", type=float, default=1.0, help="Gewicht der Expert-Aktion (0 = reines 0/1-RL)")
 ap.add_argument("--batch", type=int, default=24)
 ap.add_argument("--sample-every", type=int, default=20)
 args = ap.parse_args()
 
-CFG = dict(d=128, L=5, T=64, H=4, ff=512)
+CFG = dict(d=320, L=8, T=64, H=4, ff=1280)  # 10M-Variante: 9.917.440 Parameter
 
 data = np.load("corpus_ids.npy").astype(np.int64)
 vocab = json.load(open("vocab.json", encoding="utf-8"))["vocab"]
 V = len(vocab) + 1
 N = M.count_params(V, CFG)
 print(f"Vokabular: {V} | Parameter gesamt: {N:,}")
-assert 900_000 < N < 1_200_000, "Parameterzahl soll ~1M sein"
+assert 9_500_000 < N < 10_500_000, "Parameterzahl soll ~10M sein"
 
 rng = np.random.default_rng(1234)
 
@@ -88,7 +88,7 @@ best_ce = float("inf")
 
 
 def save_ckpt():
-    np.savez("ckpt.npz", theta=theta)
+    np.savez("ckpt.npz", theta=theta, cfg=np.array(json.dumps(CFG)))
     print(f"[ckpt] gespeichert bei {time.time()-t_start:.0f}s", flush=True)
 
 
@@ -96,7 +96,7 @@ def save_best(val_ce):
     global best_ce
     if val_ce < best_ce:
         best_ce = val_ce
-        np.savez("ckpt_best.npz", theta=theta)
+        np.savez("ckpt_best.npz", theta=theta, cfg=np.array(json.dumps(CFG)))
         print(f"[best] neue beste val_ce {val_ce:.4f} -> ckpt_best.npz", flush=True)
 
 

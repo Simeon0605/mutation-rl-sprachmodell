@@ -62,7 +62,7 @@ Verlauf: `train_log.txt` · Textproben alle 20 Generationen: `samples.txt`
 | Parameter | **1.014.400** (d_model=128, 5 Layer, 4 Köpfe, FFN=512) |
 | Kontext | 64 Zeichen |
 | Vokabular | 66 Zeichen + `<unk>` (äöüß inklusive) |
-| Korpus | Goethes *Faust* (I & II), *Faust I*, Nietzsches *Also sprach Zarathustra* (~958.000 Zeichen, Project Gutenberg, gemeinfrei) |
+| Korpus | **25 deutsche Bücher** von Project Gutenberg (Goethe, Schiller, Kafka, Fontane, Storm, Kleist, Lessing, Grimmelshausen, Brüder Grimm, Hauff u.a.) — **6,2 Mio. Zeichen**. Originale von 1669 bis 1916, also garantiert **vor 2025** 📜 |
 
 ## Troubleshooting
 
@@ -83,6 +83,15 @@ Verlauf: `train_log.txt` · Textproben alle 20 Generationen: `samples.txt`
 | `models/best_1m.npz` | fertiges 1M-Modell (val_ce 2,56) |
 | `train_log.txt` / `samples.txt` | Trainingsgeschichte inkl. Kollaps-Demo |
 
-## Branch: 10M-Variante
+## Dieser Branch: die 10M-Variante
 
-Auf dem Branch [`10m-parameter`](../../tree/10m-parameter) läuft die Skalierung auf **9.917.440 Parameter** (d_model=320, 8 Layer, FFN=1280). Training dauert dort ~10× länger (~2 min/Generation auf 12 Kernen); die Checkpoints speichern ihre Konfiguration selbst, `chat_de.py` erkennt sie automatisch.
+Hier läuft die Skalierung auf **9.917.440 Parameter** (d_model=320, 8 Layer, 4 Köpfe, FFN=1280) — trainiert auf dem erweiterten Korpus (25 Bücher, 6,2 Mio. Zeichen, alles Originale vor 2025).
+
+```powershell
+py prepare_corpus.py                  # Korpus + Token-IDs (Vokabular bleibt eingefroren)
+py train_de.py --minutes 60          # ~2 min/Generation auf 12 Kernen -> lohnt sich ab ~60 min
+py train_de.py --minutes 60 --resume # weitertrainieren
+py chat_de.py                         # Chat (Config kommt automatisch aus dem Checkpoint)
+```
+
+Checkpoints speichern ihre Architektur-Konfiguration selbst (`cfg` im npz) — `chat_de.py` erkennt 1M- und 10M-Modelle automatisch. `models/best_1m.npz` bleibt als fertiges 1M-Modell im Repo.
