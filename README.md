@@ -1,4 +1,4 @@
-# 🧬🇩🇪 Mutation-RL-Sprachmodell
+#  Mutation-RL-Sprachmodell
 
 Ein Sprachmodell mit **1.014.400 Parametern** (auf dem Branch [`10m-parameter`](../../tree/10m-parameter) gibt es eine 10M-Variante), das aus ~950 KB echtem Deutsch (Goethe, Nietzsche) **nur durch Mutation und Belohnung** Deutsch lernt.
 
